@@ -36,3 +36,39 @@ class Bun:
     
     def neglect(self):
         self.happy = False
+
+bun = Bun()  
+
+        #principal loop
+clock = pygame.time.Clock()
+interaction_timer = 0
+while True:
+  #event keys
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            pygame.quit()
+            sys.exit()
+        
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_f:  # Feed
+                bun.feed()
+                interaction_timer = 0  # Reset 
+            if event.key == pygame.K_p:  # Play
+                bun.play()
+                interaction_timer = 0
+
+   
+    interaction_timer += clock.get_time()
+    if interaction_timer > 5000:  
+        bun.neglect()
+        
+    # Draw everything
+    screen.blit(background, (0, 0))
+    if bun.happy:
+        screen.blit(happy_bun, bun_rect)
+    else:
+        screen.blit(sad_bun, bun_rect)
+    screen.blit(food_img, food_rect)
+
+    pygame.display.flip()
+    clock.tick(60)
