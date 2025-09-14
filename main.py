@@ -133,9 +133,10 @@ while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False 
-        if game_status == "game_over":    
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_f:  # Feed
+        if game_status == "playing":
+            if event.type == pygame.KEYDOWN:    
+
+             if event.key == pygame.K_f:  # Feed
                 bun.feed()
                 interaction_timer = 0  # Reset 
             elif event.key == pygame.K_p:  # Play
@@ -144,8 +145,16 @@ while running:
                 bun.health = bun.max.health
                 bun.update_mood()
 
+        elif game_status == "game_over":
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_r:  # Restart
+                    bun = Bun()  # Reset bun
+                    game_status = "playing"
+                elif event.key == pygame.K_q:  # Quit
+                    running = False
 
-   
+
+if game_status == "playing":
     bun.update_health(delta_time)
     if bun.health <= 0:
         print("Just...why? :c ") 
@@ -162,6 +171,8 @@ while running:
 
     #draw hud
     draw_hud(screen, bun)
+
+elif game_status == "game_over":
 
     pygame.display.flip()
     
