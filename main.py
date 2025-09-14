@@ -21,10 +21,16 @@ font = pygame.font.Font(None, 36) #define later
 small_font = pygame.font.Font(None, 24) #this too
 
 #img loading
-background = pygame.image.load("img/background.png")
-happy_bun = pygame.image.load("img/happy_bun.png")
-sad_bun = pygame.image.load("img/sad_bun.png")
-food_img = pygame.image.load("img/food.png")
+try:
+ background = pygame.image.load("img/background.png")
+ happy_bun = pygame.image.load("img/happy_bun.png")
+ sad_bun = pygame.image.load("img/sad_bun.png")
+ food_img = pygame.image.load("img/food.png")
+except pygame.error as e:
+    print(f"Error loading image: {e}")  
+    pygame.quit()
+    sys.exit()
+    
 food_rect = food_img.get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50))
 bun_rect = happy_bun.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
 
@@ -33,24 +39,35 @@ bun_rect = happy_bun.get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
  
 #and here scale the images
 
+#game status so user can choose what to do when bun dies
+game_status = "playing"  
+
+def draw_game_over(screen):
+    screen.fill(BLACK)
+    game_over_text = font.render("Just...why? :c", True, RED)
+    restart_text = small_font.render("Press R to Restart or Q to Quit", True, WHITE)
+    screen.blit(game_over_text, (WIDTH // 2 - game_over_text.get_width() // 2, HEIGHT // 2 - 50))
+    screen.blit(restart_text, (WIDTH // 2 - restart_text.get_width() // 2, HEIGHT // 2 + 10))
+    pygame.display.flip()
+
 #basic emotions AND health system
 class Bun:
     def __init__(self):
-        self.max.health = 100
-        self.health = self
+        self.max_health = 100
+        self.health = self.max_health
         self.happy = True 
-        self.health_decay_rate = 100/(60*60*100)
+        self.health_decay_rate = self.max_health / (60*1000)
          # 100 health over 60 seconds
     
     def feed(self):
         print("¡Yum!")
-        self.health = min(self.max.health, self.health + 20) 
+        self.health = min(self.max_health, self.health + 20) 
         #increase health by 1/5, same in the following events
         self.update_mood()
     
     def play(self):
         print("‹𝟹")
-        self.health = min(self.max.health, self.health + 20)
+        self.health = min(self.max_health, self.health + 20)
         self.update_mood()
 
     def update_health(self, delta_time):
@@ -66,7 +83,7 @@ class Bun:
         
     #get health to display in hud
     def get_health_porcentage(self):
-        return self.health / self.max.health * 100
+        return self.health / self.max_health * 100
     
     
     #background health bar
@@ -101,29 +118,29 @@ def draw_hud(screen, bun):
 
         for i, instruction in enumerate(instructions):
             inst_text = small_font.render(instruction, True, BLACK)
-            screen.blit(inst_text, (WIDTH - 250, 20))  
+            screen.blit(inst_text, (WIDTH - 250, 20+i*24))  
 
 bun = Bun()  
 
         #principal loop
 clock = pygame.time.Clock()
 interaction_timer = 0
-while True:
-    delta_time = clock.get_time() # Time since last frame in milliseconds
+running= True
+while running:
+    delta_time = clock.tick(60) 
     
   #event keys
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        
+            running = False 
+        if game_status == "game_over":    
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_f:  # Feed
                 bun.feed()
                 interaction_timer = 0  # Reset 
-            if event.key == pygame.K_p:  # Play
+            elif event.key == pygame.K_p:  # Play
                 bun.play()
-            if event.key == pygame.K_r:  # JUST TESTING! DALETE LATER
+            elif event.key == pygame.K_r:  # JUST TESTING! DALETE LATER
                 bun.health = bun.max.health
                 bun.update_mood()
 
@@ -147,4 +164,6 @@ while True:
     draw_hud(screen, bun)
 
     pygame.display.flip()
-    clock.tick(60)
+    
+pygame.quit()   
+sys.exit()
