@@ -2,6 +2,7 @@
 
 import pygame
 import sys
+import os
 from constants import WIDTH, HEIGHT
 
 def load_images():
@@ -31,3 +32,15 @@ def create_rects(images):
         'food': images['food'].get_rect(center=(WIDTH // 2, HEIGHT // 2 + 50)),
         'bun': images['happy_bun'].get_rect(center=(WIDTH // 2, HEIGHT // 2 - 50))
     }
+
+
+def load_music():
+    try:
+        music_path = os.path.join("mp3", "iddlebun.mp3")
+        pygame.mixer.music.load(music_path)
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)  # Loop indefinitely
+    except pygame.error as e:
+        print(f"Error loading music: {e}")
+        pygame.quit()
+        sys.exit()
