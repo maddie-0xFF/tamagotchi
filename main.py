@@ -4,7 +4,7 @@
 import pygame
 import sys
 from constants import WIDTH, HEIGHT, FPS
-from resources import load_images, load_fonts, create_rects
+from resources import load_images, load_fonts, create_rects, load_music, stop_music
 from bun import Bun
 from ui import draw_game, draw_game_over
 from game_logic import GameLogic
@@ -20,6 +20,9 @@ def main():
     images = load_images()
     fonts = load_fonts()
     rects = create_rects(images)
+
+    #music loading
+    load_music()
     
     # bun object and game logic
     bun = Bun()
@@ -50,7 +53,8 @@ def main():
         
         pygame.display.flip()
     
-    # cleanuuup  
+    # cleanuuup 
+    stop_music() 
     pygame.quit()
     sys.exit()
 
